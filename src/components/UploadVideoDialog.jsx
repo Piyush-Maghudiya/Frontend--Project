@@ -50,16 +50,39 @@ export default function UploadVideoDialog({ open, onOpenChange }) {
       toast.error('Please select a video file')
       return
     }
+    if (!thumbnailRef.current?.files?.[0]) {
+      toast.error('Please select a thumbnail image')
+      return
+    }
+
+    setUploading(true)
+
+    // Extract video duration
+    let duration = 0
+    try {
+      const videoFile = videoRef.current.files[0]
+      const videoEl = document.createElement('video')
+      videoEl.preload = 'metadata'
+      const durationPromise = new Promise((resolve) => {
+        videoEl.onloadedmetadata = () => {
+          resolve(Math.floor(videoEl.duration))
+          URL.revokeObjectURL(videoEl.src)
+        }
+        videoEl.onerror = () => resolve(0)
+      })
+      videoEl.src = URL.createObjectURL(videoFile)
+      duration = await durationPromise
+    } catch {
+      duration = 0
+    }
 
     const formData = new FormData()
     formData.append('title', title.trim())
     formData.append('description', description.trim())
+    formData.append('duration', duration)
     formData.append('videoFile', videoRef.current.files[0])
-    if (thumbnailRef.current?.files?.[0]) {
-      formData.append('thumbnail', thumbnailRef.current.files[0])
-    }
+    formData.append('thumbnail', thumbnailRef.current.files[0])
 
-    setUploading(true)
     const result = await uploadVideo(formData)
     setUploading(false)
 

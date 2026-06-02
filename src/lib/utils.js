@@ -36,3 +36,44 @@ export function timeAgo(date) {
   }
   return 'Just now'
 }
+
+// --- Data normalization helpers ---
+// Backend uses different field names than frontend expects.
+// These helpers transform backend responses so components work consistently.
+
+/** Normalize a user/owner object from backend format to frontend format */
+export function normalizeUser(user) {
+  if (!user) return user
+  return {
+    ...user,
+    fullName: user.fullName || user.fullname || '',
+    avatar: typeof user.avatar === 'object' ? user.avatar?.url : user.avatar,
+    coverImage: typeof user.coverImage === 'object' ? user.coverImage?.url : user.coverImage,
+  }
+}
+
+/** Normalize a channel profile from backend format to frontend format */
+export function normalizeChannel(ch) {
+  if (!ch) return ch
+  return {
+    ...ch,
+    fullName: ch.fullName || ch.fullname || '',
+    avatar: typeof ch.avatar === 'object' ? ch.avatar?.url : ch.avatar,
+    coverImage: typeof ch.coverImage === 'object' ? ch.coverImage?.url : ch.coverImage,
+    subscribersCount: ch.subscribersCount ?? ch.subscribercount ?? 0,
+    subscribedToCount: ch.subscribedToCount ?? ch.chhanelsubscribedtocount ?? 0,
+    isSubscribed: ch.isSubscribed ?? ch.issubcribed ?? false,
+  }
+}
+
+/** Normalize a video object from backend format to frontend format */
+export function normalizeVideo(video) {
+  if (!video) return video
+  return {
+    ...video,
+    likesCount: video.likesCount ?? video.likescount ?? 0,
+    isLiked: video.isLiked ?? video.isliked ?? false,
+    owner: video.owner ? normalizeUser(video.owner) : video.owner,
+  }
+}
+

@@ -4,12 +4,12 @@ import {
   getVideoById,
   getChannelProfile,
   toggleVideoLike,
-  subscribeToChannel,
-  unsubscribeFromChannel,
+  toggleSubscription,
   uploadVideo as uploadVideoApi,
 } from '../services/api'
 import useAuthStore from './authStore'
 import { MOCK_VIDEOS, MOCK_CHANNEL, MOCK_COMMENTS } from '../data/mockData'
+import { normalizeVideo, normalizeChannel } from '../lib/utils'
 
 const useVideoStore = create((set, get) => ({
   videos: [],
@@ -33,7 +33,8 @@ const useVideoStore = create((set, get) => ({
     })
     try {
       const { data } = await getVideos({ page, limit: 8 })
-      const newVideos = data.data?.docs || data.data || []
+      const rawVideos = data.data?.docs || data.data || []
+      const newVideos = rawVideos.map(normalizeVideo)
       set((state) => ({
         videos: reset ? newVideos : [...state.videos, ...newVideos],
         page: page + 1,
@@ -77,7 +78,7 @@ const useVideoStore = create((set, get) => ({
     set({ isLoading: true, error: null, currentVideo: null })
     try {
       const { data } = await getVideoById(videoId)
-      set({ currentVideo: data.data, isLoading: false, useMock: false })
+      set({ currentVideo: normalizeVideo(data.data), isLoading: false, useMock: false })
     } catch {
       const video = MOCK_VIDEOS.find((v) => v._id === videoId) || MOCK_VIDEOS[0]
       set({ currentVideo: video, isLoading: false, useMock: true })
@@ -88,7 +89,7 @@ const useVideoStore = create((set, get) => ({
     set({ isLoading: true, error: null, channel: null })
     try {
       const { data } = await getChannelProfile(username)
-      set({ channel: data.data, isLoading: false, useMock: false })
+      set({ channel: normalizeChannel(data.data), isLoading: false, useMock: false })
     } catch {
       set({
         channel: { ...MOCK_CHANNEL, username: username || MOCK_CHANNEL.username },
@@ -134,11 +135,7 @@ const useVideoStore = create((set, get) => ({
     const isSubscribed = options.isSubscribed ?? channel?.isSubscribed ?? false
 
     try {
-      if (isSubscribed) {
-        await unsubscribeFromChannel(channelId)
-      } else {
-        await subscribeToChannel(channelId)
-      }
+      await toggleSubscription(channelId)
     } catch {
       // update local state when API unavailable
     }

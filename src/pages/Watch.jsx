@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import useVideoStore from '@/store/videoStore'
 import useAuthStore from '@/store/authStore'
 import { formatViews, timeAgo } from '@/lib/utils'
-import { MOCK_VIDEOS, MOCK_COMMENTS } from '@/data/mockData'
+import { MOCK_COMMENTS } from '@/data/mockData'
 import { toast } from 'sonner'
 
 export default function Watch() {
@@ -41,8 +41,9 @@ export default function Watch() {
     }
     const ownerId = currentVideo?.owner?._id
     if (!ownerId) return
-    await toggleSubscribe(ownerId, { isSubscribed: owner.isSubscribed })
-    toast.success(owner.isSubscribed ? 'Unsubscribed' : 'Subscribed!')
+    const wasSubscribed = currentVideo?.owner?.isSubscribed
+    await toggleSubscribe(ownerId, { isSubscribed: wasSubscribed })
+    toast.success(wasSubscribed ? 'Unsubscribed' : 'Subscribed!')
   }
 
   if (isLoading || !currentVideo) {

@@ -10,7 +10,8 @@ api.interceptors.response.use(
   (error) => {
     const message =
       error.response?.data?.message || error.message || 'Something went wrong'
-    return Promise.reject({ ...error, message })
+    error.message = message
+    return Promise.reject(error)
   }
 )
 
@@ -29,37 +30,36 @@ export const logoutUser = () => api.post('/api/v1/users/logout')
 
 export const getCurrentUser = () => api.get('/api/v1/users/current-user')
 
-// Videos
-export const getVideos = (params) => api.get('/api/v1/videos', { params })
+// Videos  (backend mounts at /api/v1/video — singular)
+export const getVideos = (params) => api.get('/api/v1/video', { params })
 
-export const getVideoById = (videoId) => api.get(`/api/v1/videos/${videoId}`)
+export const getVideoById = (videoId) => api.get(`/api/v1/video/${videoId}`)
 
 export const uploadVideo = (formData) =>
-  api.post('/api/v1/videos', formData, {
+  api.post('/api/v1/video', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
 
-export const deleteVideo = (videoId) => api.delete(`/api/v1/videos/${videoId}`)
+export const deleteVideo = (videoId) => api.delete(`/api/v1/video/${videoId}`)
 
 // Channels
 export const getChannelProfile = (username) =>
   api.get(`/api/v1/users/c/${username}`)
 
-// Subscriptions
-export const subscribeToChannel = (channelId) =>
-  api.post(`/api/v1/subscriptions/c/${channelId}`)
-
-export const unsubscribeFromChannel = (channelId) =>
-  api.delete(`/api/v1/subscriptions/c/${channelId}`)
+// Subscriptions  (backend mounts at /api/v1/subcriptions — with typo)
+// Backend uses a single POST toggle — no separate DELETE route
+export const toggleSubscription = (channelId) =>
+  api.post(`/api/v1/subcriptions/c/${channelId}`)
 
 // Likes
 export const toggleVideoLike = (videoId) =>
   api.post(`/api/v1/likes/toggle/v/${videoId}`)
 
-// Playlists
-export const getPlaylists = () => api.get('/api/v1/playlists')
+// Playlists  (backend mounts at /api/v1/playlist — singular)
+export const getPlaylists = (userId) =>
+  api.get(`/api/v1/playlist/user/${userId}`)
 
-export const createPlaylist = (data) => api.post('/api/v1/playlists', data)
+export const createPlaylist = (data) => api.post('/api/v1/playlist', data)
 
 export const addVideoToPlaylist = (playlistId, videoId) =>
-  api.post(`/api/v1/playlists/${playlistId}/videos/${videoId}`)
+  api.patch(`/api/v1/playlist/add/${videoId}/${playlistId}`)

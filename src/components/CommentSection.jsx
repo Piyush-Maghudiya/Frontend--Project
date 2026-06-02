@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
@@ -12,6 +12,10 @@ export default function CommentSection({ comments = [] }) {
   const [newComment, setNewComment] = useState('')
   const [localComments, setLocalComments] = useState(comments)
   const { user, isAuthenticated } = useAuthStore()
+
+  useEffect(() => {
+    setLocalComments(comments)
+  }, [comments])
 
   const handleSubmit = (e) => {
     e.preventDefault()

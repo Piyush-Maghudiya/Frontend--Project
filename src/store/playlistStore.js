@@ -26,7 +26,13 @@ const usePlaylistStore = create((set, get) => ({
   fetchPlaylists: async () => {
     set({ isLoading: true })
     try {
-      const { data } = await getPlaylists()
+      const user = useAuthStore.getState().user
+      if (!user?._id) {
+        const stored = getStoredPlaylists()
+        set({ playlists: stored.length ? stored : DEFAULT_PLAYLISTS, isLoading: false })
+        return
+      }
+      const { data } = await getPlaylists(user._id)
       set({ playlists: data.data || [], isLoading: false })
     } catch {
       const stored = getStoredPlaylists()

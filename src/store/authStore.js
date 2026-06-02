@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { getCurrentUser, loginUser, logoutUser, registerUser } from '../services/api'
+import { normalizeUser } from '../lib/utils'
 
 const useAuthStore = create((set, get) => ({
   user: null,
@@ -13,7 +14,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const { data } = await getCurrentUser()
-      set({ user: data.data, isAuthenticated: true, isLoading: false })
+      set({ user: normalizeUser(data.data), isAuthenticated: true, isLoading: false })
     } catch {
       set({ user: null, isAuthenticated: false, isLoading: false })
     }
@@ -23,7 +24,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const { data } = await loginUser(credentials)
-      set({ user: data.data.user, isAuthenticated: true, isLoading: false })
+      set({ user: normalizeUser(data.data.user), isAuthenticated: true, isLoading: false })
       return { success: true }
     } catch (err) {
       set({ error: err.message, isLoading: false })
@@ -35,7 +36,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const { data } = await registerUser(formData)
-      set({ user: data.data, isAuthenticated: true, isLoading: false })
+      set({ user: normalizeUser(data.data), isAuthenticated: true, isLoading: false })
       return { success: true }
     } catch (err) {
       set({ error: err.message, isLoading: false })

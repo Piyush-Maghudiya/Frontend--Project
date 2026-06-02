@@ -37,7 +37,10 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const formData = new FormData()
-    Object.entries(form).forEach(([key, value]) => formData.append(key, value))
+    formData.append('fullname', form.fullName)
+    formData.append('username', form.username)
+    formData.append('email', form.email)
+    formData.append('password', form.password)
     if (avatarRef.current?.files[0]) formData.append('avatar', avatarRef.current.files[0])
     if (coverRef.current?.files[0]) formData.append('coverImage', coverRef.current.files[0])
 
