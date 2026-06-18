@@ -31,7 +31,7 @@ export const logoutUser = () => api.post('/api/v1/users/logout')
 export const getCurrentUser = () => api.get('/api/v1/users/current-user')
 
 // Videos  (backend mounts at /api/v1/video — singular)
-export const getVideos = (params) => api.get('/api/v1/video', { params })
+export const getVideos = (params) => api.get('/api/v1/video/', { params })
 
 export const getVideoById = (videoId) => api.get(`/api/v1/video/${videoId}`)
 
